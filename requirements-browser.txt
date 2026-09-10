@@ -1,0 +1,3 @@
+-r requirements-apply.txt
+playwright>=1.55,<2
+

@@ -1,0 +1,54 @@
+# Paid service + persistent disk. Review Render's price before deployment.
+services:
+  - type: web
+    name: cleo-jobs-apply
+    runtime: python
+    plan: 0.5c-512mb
+    region: oregon
+    numInstances: 1
+    autoDeployTrigger: "off"
+    buildCommand: pip install -r requirements-browser.txt && python -m playwright install chromium
+    startCommand: python jobapply_service.py
+    healthCheckPath: /healthz
+    disk:
+      name: cleo-application-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.12
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      # Keep browser binaries inside the deployed Python environment, not Render's build-only cache.
+      - key: PLAYWRIGHT_BROWSERS_PATH
+        value: "0"
+      - key: JOB_APPLY_DB
+        value: /data/applications.sqlite3
+      - key: JOB_APPLY_INGEST_TOKEN
+        generateValue: true
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: JOB_APPLY_CHANNEL_ID
+        sync: false
+      - key: JOB_APPLY_OWNER_ID
+        sync: false
+      # Preserve the existing Dashboard-controlled preparation setting.
+      - key: JOB_APPLY_PREPARE_ENABLED
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        sync: false
+      # Enable live form inspection while keeping every transmitting action fail-closed.
+      - key: JOB_APPLY_FORMS_ENABLED
+        value: "true"
+      - key: JOB_APPLY_TRANSMIT_ENABLED
+        value: "false"
+      - key: JOB_APPLY_TRANSMIT_ATS
+        value: ""
+      - key: JOB_APPLY_BROWSER_DATA
+        value: /data/browser
+      - key: JOB_APPLY_AUTO_SUBMIT_MIN_SCORE
+        value: "90"
+      - key: JOB_APPLY_PROFILE_JSON
+        sync: false

@@ -1,0 +1,37 @@
+{
+  "_comment": "Copy to profiles/apply_profile.json (gitignored) and fill in. Every value here is transmitted to employers verbatim, so review each one. Anything absent stays blank and is asked in Discord instead.",
+  "schema_version": 1,
+  "identity": {
+    "first_name": "",
+    "last_name": "",
+    "preferred_name": "",
+    "legal_name": "",
+    "email": "",
+    "phone": "",
+    "country": "",
+    "city": "",
+    "state": "",
+    "zip": "",
+    "location": ""
+  },
+  "links": {
+    "linkedin": "",
+    "github": "",
+    "portfolio": ""
+  },
+  "attachments": {
+    "resume": "approved_resume.pdf"
+  },
+  "_identity_comment": "preferred_name defaults to first_name, and legal_name defaults to full name, if left blank. Fill city/state/zip/country separately for employers that split address into its own fields; location still covers a single combined field.",
+  "_questions_comment": "Sponsorship, legal, demographic, consent, pay, availability and clearance questions are never inferred from the contact details above. Each one needs an entry here. `match` is matched as lowercase alphanumeric text against the employer's field label; keep it specific enough that it cannot hit a different question. Checkbox answers must be true or false. Select, combobox (Greenhouse's custom country/yes-no picker) and radio-style answers must equal one of the employer's own options. A grouped checkbox question (for example 'which clearances do you hold, select all that apply') needs a list of the option label(s) to check; an empty list leaves every box unchecked.",
+  "questions": [
+    {"match": "authorized to work", "value": "Yes"},
+    {"match": "require sponsorship", "value": "No"},
+    {"match": "will you now or in the future require sponsorship", "value": "No"},
+    {"match": "current security clearance status", "value": "None"},
+    {"match": "clearance level", "value": "None"},
+    {"match": "which of the following clearances", "value": []},
+    {"match": "how did you hear about", "value": "Company website"}
+  ]
+}
+

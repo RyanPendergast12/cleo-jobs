@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+*.db
+*.sqlite*
+browser
+__pycache__
+*.pdf
+*.docx
+test_stubs
+

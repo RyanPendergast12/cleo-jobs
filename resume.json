@@ -1,0 +1,16 @@
+{
+  "_comment": "Evidence sidecar derived only from Cleo_Navarro_Resume.docx. Skill names match SKILLS_VOCAB in jobwatch_readiness.py.",
+  "years": 1.4,
+  "degree_level": "BS",
+  "advanced_degree_in_progress": false,
+  "clearance": null,
+  "skills": [
+    "Patient Scheduling", "Patient Intake", "Insurance Verification", "Referral Verification",
+    "Patient Communication", "Provider Communication", "Medical Office Operations", "Phreesia",
+    "Vitals", "Specimen Handling", "Onboarding", "Offboarding", "HR Records",
+    "Compliance Documentation", "Records Auditing", "Data Entry", "Workday", "Oracle", "ADP",
+    "Employee Relations", "Benefits", "Employee Wellness", "Expense Management", "Travel Coordination",
+    "Customer Service", "POS", "Payment Processing", "Social Media", "Email Marketing",
+    "Community Outreach", "Crisis Hotline Support", "Resource Coordination"
+  ]
+}

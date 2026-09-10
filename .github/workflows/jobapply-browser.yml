@@ -1,0 +1,22 @@
+name: Cleo Jobs application browser runtime
+on:
+  pull_request:
+    paths:
+      - 'jobapply_*.py'
+      - 'test_jobwatch_browser_runtime.py'
+      - 'requirements*txt'
+      - 'Dockerfile.jobapply*'
+      - '.github/workflows/jobapply-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build browser-capable application image
+        run: docker build -f Dockerfile.jobapply -t cleo-jobs-browser-test .
+      - name: Test Chromium against local form fixtures
+        run: docker run --rm --network none -e JOB_APPLY_BROWSER_TESTS=1 cleo-jobs-browser-test python -m unittest test_jobwatch_browser_runtime -v

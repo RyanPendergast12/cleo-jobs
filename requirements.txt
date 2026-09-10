@@ -1,0 +1,15 @@
+# Runtime dependencies for jobwatch.py (the scheduled scanner) and its
+# analytics modules (jobwatch_readiness.py, jobwatch_trends.py).
+#
+# The résumé-prep service has its own separate list: requirements-apply.txt
+#
+# Optional: the disabled indeed / glassdoor direct-scrape adapters also need
+#   playwright>=1.44,<2   +   playwright install chromium
+# Install that only if you turn those two sources on in ENABLED_SOURCES.
+
+requests>=2.32,<3
+feedparser>=6.0,<7
+beautifulsoup4>=4.12,<5
+matplotlib>=3.8,<4
+numpy>=1.26,<3
+

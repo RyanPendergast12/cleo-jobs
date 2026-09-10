@@ -1,0 +1,88 @@
+name: cleo-jobs
+
+on:
+  schedule:
+    - cron: '7 */2 * * *'   # every 2 hours, UTC, offset 7 min past the hour (avoids GitHub's
+                             # documented top-of-hour congestion window). Edit the "2" to
+                             # change frequency; keep the "7" offset rather than "0".
+  workflow_dispatch:      # adds a manual "Run workflow" button on the Actions tab
+    inputs:
+      force_readiness:
+        description: 'Force-post the readiness octagram now (bypass the once/day gate)'
+        type: boolean
+        default: false
+      force_job_map:
+        description: 'Force-post the job market trend chart now'
+        type: boolean
+        default: false
+      force_skills_export:
+        description: 'Force-post the needed-skills CSV now (bypass the once/day gate)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cleo-jobs-poll
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # The live dedup / market-history DB is carried between runs in the Actions
+      # cache and starts empty on the first Cleo Jobs run. Ryan's JobWatch history
+      # is intentionally never copied into this repository.
+      - name: Restore dedup database
+        uses: actions/cache/restore@v4
+        with:
+          path: jobwatch.db
+          key: cleo-jobs-db-${{ github.run_id }}
+          restore-keys: |
+            cleo-jobs-db-
+
+      - name: Run jobwatch
+        id: scan
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          JOB_MAP_WEBHOOK_URL: ${{ secrets.JOB_MAP_WEBHOOK_URL }}
+          JOB_READINESS_WEBHOOK_URL: ${{ secrets.JOB_READINESS_WEBHOOK_URL }}
+          NEEDED_SKILLS_WEBHOOK_URL: ${{ secrets.NEEDED_SKILLS_WEBHOOK_URL }}
+          JOB_APPLY_SERVICE_URL: ${{ secrets.JOB_APPLY_SERVICE_URL }}
+          JOB_APPLY_INGEST_TOKEN: ${{ secrets.JOB_APPLY_INGEST_TOKEN }}
+          JOBDATA_API_KEY: ${{ secrets.JOBDATA_API_KEY }}
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GSHEET_WEBAPP_URL: ${{ secrets.GSHEET_WEBAPP_URL }}
+          GSHEET_WEBAPP_TOKEN: ${{ secrets.GSHEET_WEBAPP_TOKEN }}
+          FORCE_READINESS: ${{ github.event.inputs.force_readiness }}
+          FORCE_JOB_MAP: ${{ github.event.inputs.force_job_map }}
+          FORCE_SKILLS_EXPORT: ${{ github.event.inputs.force_skills_export }}
+        run: python jobwatch.py
+
+      - name: Compact dedup database
+        if: ${{ always() && steps.scan.outcome != 'skipped' }}
+        continue-on-error: true
+        run: python -c "import sqlite3, pathlib; p='jobwatch.db'; pathlib.Path(p).exists() and sqlite3.connect(p).execute('VACUUM')"
+
+      - name: Save dedup database
+        if: ${{ always() && steps.scan.outcome != 'skipped' }}
+        uses: actions/cache/save@v4
+        with:
+          path: jobwatch.db
+          key: cleo-jobs-db-${{ github.run_id }}

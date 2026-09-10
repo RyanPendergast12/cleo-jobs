@@ -1,0 +1,32 @@
+__pycache__/
+*.pyc
+
+# secrets / local config
+.env
+*.env
+!.env.example
+
+# résumé-prep service private state — never commit (see JOB_APPLY.md)
+applications.sqlite3
+*.applications.sqlite3
+/data/
+generated_resumes/
+*.answer-packet.json
+
+# personal answers sent to employers, and employer cookies — keep only the example
+profiles/apply_profile.json
+browser/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# build / test
+dist/
+build/
+.pytest_cache/
+
+# live dedup DB — carried in the Actions cache, never copied from another repository
+/jobwatch.db

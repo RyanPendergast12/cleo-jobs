@@ -1,0 +1,6 @@
+# Normalize line endings: keep everything LF in the repo regardless of OS.
+* text=auto eol=lf
+
+# jobwatch.db is a binary SQLite file — never line-ending-munge or try to diff it.
+*.db binary
+
