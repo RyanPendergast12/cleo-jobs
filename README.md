@@ -13,7 +13,7 @@ Cleo Jobs searches for four evidence-supported groups:
 - Administrative operations: administrative assistant/coordinator, office coordinator, operations coordinator, executive assistant, and program coordinator.
 - Public health: public-health programs, community health, health education, outreach, and resource coordination.
 
-The LinkedIn adapter searches both Las Vegas-area local jobs and nationwide remote jobs. Onsite or hybrid jobs outside the configured Las Vegas-area metros are blocked by the match layer.
+The LinkedIn adapter searches both Las Vegas-area local jobs and nationwide remote jobs posted during the previous seven days. Database deduplication prevents repeat alerts on later two-hour runs. Onsite or hybrid jobs outside the configured Las Vegas-area metros are blocked by the match layer.
 
 Senior, manager, supervisor, director, lead, commission-only, and licensed-clinical titles are excluded or blocked when Cleo's supplied resume does not document the required level or credential.
 
@@ -134,4 +134,3 @@ docker run --rm --network none -e JOB_APPLY_BROWSER_TESTS=1 \
 8. Deploy the separate Render service only if resume preparation is wanted.
 9. Test employer forms in inspection-only mode.
 10. Enable individual ATS transmission only after its real fixtures pass.
-

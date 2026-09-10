@@ -256,7 +256,7 @@ class SourceTests(unittest.TestCase):
         <span class="job-search-card__location">Remote</span></li>
         """
         limited = Mock(status_code=429, ok=False)
-        with patch.object(jw, "_get", side_effect=[ok, limited]), patch.object(jw.time, "sleep"):
+        with patch.object(jw, "_get", side_effect=[ok, limited]) as get, patch.object(jw.time, "sleep"):
             original_terms = jw.SEARCH_TERMS
             original_markets = jw.LINKEDIN_SEARCH_MARKETS
             try:
@@ -268,6 +268,7 @@ class SourceTests(unittest.TestCase):
                 jw.LINKEDIN_SEARCH_MARKETS = original_markets
         self.assertEqual(len(jobs), 1)
         self.assertIn("rate limited", jw.SOURCE_STATUS["linkedin"])
+        self.assertIn("f_TPR=r604800", get.call_args_list[0].args[0])
 
 
 if __name__ == "__main__":

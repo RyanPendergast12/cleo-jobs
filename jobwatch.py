@@ -185,6 +185,7 @@ LINKEDIN_FETCH_FULL_DESC = True   # fetch each job's full description (for Exper
                                     # for evidence about the individual posting. Set to
                                     # False to go back to zero extra LinkedIn requests.
 LINKEDIN_DETAIL_DELAY = 2.0       # politeness delay between these per-job detail fetches
+LINKEDIN_TIME_RANGE = "r604800"   # include jobs posted during the previous 7 days
 
 # Per-source search terms (used by API/scrape sources that take a query).
 SEARCH_TERMS = [
@@ -440,7 +441,8 @@ def src_hiringcafe():
 
 def src_linkedin():
     """LinkedIn guest endpoint. PUBLIC, no login, but against ToS and IP-rate-limited.
-    f_TPR=r86400 restricts to the last 24h, which is exactly what an alert poller wants."""
+    f_TPR=r604800 searches the previous 7 days. Database deduplication prevents the
+    two-hour poller from repeatedly alerting on the same listing."""
     if BeautifulSoup is None:
         raise RuntimeError("pip install beautifulsoup4")
     jobs, seen_links = [], set()
@@ -449,7 +451,7 @@ def src_linkedin():
         # One page in each market keeps request volume controlled while covering
         # both Las Vegas-area jobs and nationwide remote roles.
         for location, workplace_type in LINKEDIN_SEARCH_MARKETS:
-            q = {"keywords": term, "location": location, "f_TPR": "r86400",
+            q = {"keywords": term, "location": location, "f_TPR": LINKEDIN_TIME_RANGE,
                  "f_WT": workplace_type, "start": 0}
             r = _get(base + "?" + urlencode({k: v for k, v in q.items() if v != ""}))
             if r.status_code == 429:
@@ -1702,7 +1704,8 @@ if __name__ == "__main__":
 #                    jobs, run-sync-get-dataset-items endpoint) or a Playwright-driven
 #                    scraper since you already use Playwright for your flight-deal finder.
 # linkedin           Guest endpoint works without login but is against ToS and rate-limited.
-#                    Kept tiny (4 terms x 2 pages, 2.5s sleep, last-24h filter). If you get a
+#                    Kept controlled (search terms x 2 markets, one page each, 2.5s sleep,
+#                    seven-day filter). If you get a
 #                    429, the adapter backs off for the pass. Don't run this from your work IP.
 # wellfound          Disabled. Needs Playwright (which you already use). When you wire it,
 #                    reuse your existing Chromium session and parse the role cards.
@@ -1757,4 +1760,3 @@ if __name__ == "__main__":
 #                    Aggregates across many boards itself, so expect the highest cross-
 #                    source dedup collision rate of any adapter here.
 # ─────────────────────────────────────────────────────────────────────────────
-
